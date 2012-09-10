@@ -16,18 +16,27 @@ module FPAddSub_NormalizeModule(
 		M,
 		E,
 		S,
+		C,
 		Z
     );
 
-	input [25:0] M ;
+	// Input ports
+	input [24:0] M ;
 	input [7:0] E ;
 	input S ;
+	input C ;
 	
+	// Output ports
 	output [31:0] Z ;
 	
-	wire [31:0] ACnt ;
-	wire [5:0] ZCnt ;
+	wire [5:0] Sh ;
+	wire [24:0] PSS ;
+	wire [7:0] Exp = (C ? (E[7:0])+1 : E[7:0]) ;
 
-	FPAddSub_LNCModule LNCModule(ACnt, ZCnt) ;
+	FPAddSub_LNCModule LNCModule(M[24:0], Sh) ;
+	
+	assign PSS = M[24:0] << Sh ;
+	
+	assign Z = {S, Exp[7:0], PSS[24:2]} ;
 
 endmodule

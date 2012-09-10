@@ -27,7 +27,7 @@ module FPAddSub(
 	
 	// Output ports
 	output [31:0] Z ;
-	
+
 	// Internal wires between modules
 	wire [7:0] Es ;												// Align->Execute: The (after alignment) common exponent
 	wire MaxAB ;													// Align->Execute: Indicates the larger of A and B(0/A, 1/B)
@@ -35,21 +35,24 @@ module FPAddSub(
 	wire [49:0] Mmin ;											// Align->Execute: The smaller mantissa
 	wire Sa ;														// Align->Execute: A's sign bit
 	wire Sb ;	
-	wire Cout ;
+	wire Carry ;
 	wire StickyBit ;
 	wire RoundBit ;
 	wire GuardBit ;
 	wire [25:0] Sum ;
 	wire Opr ;
+	wire OpC ;
+	wire Sgn ;
 	wire [25:0] OpA ;
 	wire [25:0] OpB ;
-	wire OpC ;
 	
-	FPAddSub_AlignModule		AlignModule(A[31:0], B[31:0], Es[7:0], MaxAB, Mmax[24:0], Mmin[49:0], Sa, Sb) ;
+	FPAddSub_AlignModule		AlignModule(A[31:0], B[31:0], Es[7:0], MaxAB, Mmax[23:0], Mmin[48:0], Sa, Sb) ;
 
-	FPAddSub_ExecuteModule 	ExecuteModule(Mmax[24:0], Mmin[49:0], Sa, Sb, OpMode, Cout, StickyBit, RoundBit, GuardBit, Sum[25:0], Opr, OpA[25:0], OpB[25:0], OpC) ;
+	FPAddSub_ExecuteModule 	ExecuteModule(Mmax[23:0], Mmin[48:0], Sa, Sb, OpMode, Carry, StickyBit, RoundBit, GuardBit, Sum[24:0], Opr, OpA[25:0], OpB[25:0], OpC) ;
 
-	FPAddSub_NormalizeModule NormalizeModule(Sum[25:0], Es[7:0], Opr, Z[31:0]) ;
+	assign Z = {Sa, Es[7:0], Sum[22:0]} ;
+
+	//FPAddSub_NormalizeModule NormalizeModule(Sum[25:0], Es[7:0], Sgn, Carry, Z[31:0]) ;
 
    // DSP48E1: 48-bit Multi-Functional Arithmetic Block
    //          Virtex-6
