@@ -32,11 +32,12 @@ module FPAddSub_ExecuteModule_tb;
 	reg MaxAB;
 	reg OpMode;
 	reg G;
-	reg S;
+	reg PS;
 
 	// Outputs
 	wire [25:0] Sum;
-	wire Sgn;
+	wire PSgn;
+	wire Opr;
 
 	// Instantiate the Unit Under Test (UUT)
 	FPAddSub_ExecuteModule uut (
@@ -47,9 +48,10 @@ module FPAddSub_ExecuteModule_tb;
 		.MaxAB(MaxAB),
 		.OpMode(OpMode), 
 		.G(G),
-		.S(S),
+		.PS(PS),
 		.Sum(Sum),
-		.Sgn(Sgn)
+		.PSgn(PSgn),
+		.Opr(Opr)
 	);
 
 	initial begin
@@ -61,7 +63,7 @@ module FPAddSub_ExecuteModule_tb;
 		MaxAB = 0;
 		OpMode = 0;
 		G = 0;
-		S = 0;
+		PS = 0;
 
 		// Wait 100 ns for global reset to finish
 		#10;

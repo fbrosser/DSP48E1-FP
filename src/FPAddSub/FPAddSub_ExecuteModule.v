@@ -19,9 +19,10 @@ module FPAddSub_ExecuteModule(
 		MaxAB,
 		OpMode,
 		G,
-		S,
+		PS,
 		Sum,
-		Sgn
+		PSgn,
+		Opr
     );
 
 	// Input ports
@@ -32,17 +33,17 @@ module FPAddSub_ExecuteModule(
 	input MaxAB ;							// Indicates the larger number (0/A, 1/B)
 	input OpMode ;							// Operation to be performed (0/Add, 1/Sub)
 	input G ;								// Guard bit
-	input S ;								// Sticky bit
+	input PS ;								// Pre-Sticky bit
 	
 	// Output ports
 	output [25:0] Sum ;					// The result of the operation
-	output Sgn ;							// The sign for the result
+	output PSgn ;							// The sign for the result
+	output Opr ;							// The effective (performed) operation
 	
 	// Internal signals
 	wire [24:0] OpA ;						// Operand A for add/sub
 	wire [26:0] OpB ;						// Operand B for add/sub
 	wire OpC ;								// Operand C (carry)
-	wire Opr ;								// The effective operation
 	
 	assign Opr = (OpMode^Sa^Sb); 		// Resolve sign to determine operation
 	assign OpA = Mmax;					// Operand A is simply the larger mantissa
@@ -50,11 +51,11 @@ module FPAddSub_ExecuteModule(
 	// DSP48E1: ALU
 	assign OpB = (Opr ? (~({1'b0, Mmin[24:0]})) : Mmin[24:0]) ; // Determine Operand B
 	
-	assign OpC	= Opr & ~(G | S) ;	// Compute carry to compensate for 1's complement
+	assign OpC	= Opr & ~(G | PS) ;	// Compute carry to compensate for 1's complement
 	
 	// DSP48E1: ALU
 	assign Sum 	= (OpA + OpB + OpC) ;	// Compute actual sum
 	
-	assign Sgn = (MaxAB ? Sb : Sa) ;		// Assign result sign
+	assign PSgn = (MaxAB ? Sb : Sa) ;		// Assign result sign
 
 endmodule

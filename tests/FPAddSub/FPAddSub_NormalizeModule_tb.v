@@ -25,32 +25,54 @@
 module FPAddSub_NormalizeModule_tb;
 
 	// Inputs
-	reg [25:0] M;
-	reg [7:0] E;
-	reg S;
+	reg [25:0] Sum;
+	reg [7:0] CExp;
+	reg G;
+	reg PS;
+	reg Opr;
 
 	// Outputs
-	wire [31:0] Z;
+	wire [22:0] NormM;
+	wire [7:0] NormE;
+	wire [5:0] Shift;
+	wire R;
+	wire S;
 
 	// Instantiate the Unit Under Test (UUT)
 	FPAddSub_NormalizeModule uut (
-		.M(M), 
-		.E(E), 
-		.S(S), 
-		.Z(Z)
+		.Sum(Sum), 
+		.CExp(CExp), 
+		.G(G), 
+		.PS(PS),
+		.Opr(Opr),
+		.NormM(NormM),
+		.NormE(NormE),
+		.Shift(Shift),
+		.R(R),
+		.S(S)
 	);
 
 	initial begin
 		// Initialize Inputs
-		M = 0;
-		E = 0;
-		S = 0;
-
+		Sum = 0;
+		CExp = 0;
+		G = 0;
+		PS = 0;
+		Opr = 0;
+		
 		// Wait 100 ns for global reset to finish
 		#100;
         
 		// Add stimulus here
-
+		#10 Sum = 26'b01000000000000000000000000; CExp = 8'b0111_1111;
+		#10 Sum = 26'b11000000000000000000000000; CExp = 8'b0111_1111;
+		#10 Sum = 26'b10000000000000000000000000; CExp = 8'b0000_0000;
+		#10 Sum = 26'b00000010000000000000000000; CExp = 8'b0111_1111;
+		#10 Sum = 26'b10000000100000000000000001; CExp = 8'b1000_0000;
+		#10 Sum = 26'b10000000100001000000000000; CExp = 8'b1000_0001;
+		#10 Sum = 26'b10000000100000000000000000; CExp = 8'b1000_0000;
+		#10 $finish;
+		
 	end
       
 endmodule
