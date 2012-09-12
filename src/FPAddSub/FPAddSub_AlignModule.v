@@ -4,7 +4,7 @@
 //
 // Create Date:    10:43:14 09/05/2012 
 // Module Name:    FPAddSub_AlignModule 
-// Project Name: 	 CHiPES Project
+// Project Name: 	 Floating Point Project
 // Author:			 Fredrik Brosser
 //
 // Description:	 Alignment module for a floating point adder using IEEE754

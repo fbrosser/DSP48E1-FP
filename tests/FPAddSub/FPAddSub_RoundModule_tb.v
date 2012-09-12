@@ -26,14 +26,15 @@ module FPAddSub_RoundModule_tb;
 
 	// Inputs
 	reg Sgn;
-	reg [7:0] NormE;
+	reg [8:0] NormE;
 	reg [22:0] NormM;
 	reg R;
 	reg S;
 	reg [1:0] RoundMode;
 
 	// Outputs
-	wire [31:0] Z;
+	wire [22:0] RoundM;
+	wire [8:0] RoundE;
 	wire Inexact;
 
 	// Instantiate the Unit Under Test (UUT)
@@ -44,7 +45,8 @@ module FPAddSub_RoundModule_tb;
 		.R(R), 
 		.S(S), 
 		.RoundMode(RoundMode), 
-		.Z(Z), 
+		.RoundM(RoundM),
+		.RoundE(RoundE),
 		.Inexact(Inexact)
 	);
 
@@ -58,10 +60,30 @@ module FPAddSub_RoundModule_tb;
 		RoundMode = 0;
 
 		// Wait 100 ns for global reset to finish
-		#100;
+		#10;
         
 		// Add stimulus here
-
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b0; S = 1'b0; RoundMode = 2'b00;
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b0; S = 1'b0; RoundMode = 2'b01;
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b0; S = 1'b0; RoundMode = 2'b10;
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b0; S = 1'b0; RoundMode = 2'b11;
+		
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b1; S = 1'b0; RoundMode = 2'b00;
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b1; S = 1'b0; RoundMode = 2'b01;
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b1; S = 1'b0; RoundMode = 2'b10;
+		#10 Sgn = 1'b0; NormE = 8'b0111_1111; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b1; S = 1'b0; RoundMode = 2'b11;
+		
+		#10 Sgn = 1'b0; NormE = 8'b0000_0000; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b0; S = 1'b0; RoundMode = 2'b00;
+		#10 Sgn = 1'b0; NormE = 8'b0000_0000; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b0; S = 1'b0; RoundMode = 2'b01;
+		
+		#10 Sgn = 1'b0; NormE = 8'b1000_0000; NormM = 23'b0000_0000_0000_0000_0000_0011; R = 1'b0; S = 1'b0; RoundMode = 2'b00;
+		#10 Sgn = 1'b0; NormE = 8'b1000_0000; NormM = 23'b0000_0000_0000_0000_0000_0010; R = 1'b0; S = 1'b1; RoundMode = 2'b11;
+		
+		#10 Sgn = 1'b0; NormE = 8'b1000_0000; NormM = 23'b0000_0000_0000_0000_0000_0001; R = 1'b1; S = 1'b1; RoundMode = 2'b00;
+		#10 Sgn = 1'b0; NormE = 8'b1000_0001; NormM = 23'b0000_0000_0000_0000_0000_0000; R = 1'b1; S = 1'b0; RoundMode = 2'b10;
+	
+		#10 $finish;
+		
 	end
       
 endmodule

@@ -14,7 +14,7 @@
 //						 A (32 bit)		: Single precision IEEE754 floating point number
 //						 B (32 bit)		: Single precision IEEE754 floating point number
 //						 Ctrl (3 bit)	: Control signals, consisting of the following fields (from MSB to LSB):
-//												Bit 2-1: Rounding mode (2 bit): 	00 - Even rounding (nearest even)
+//												Bit 2-1: Rounding mode (2 bit): 	00 - Round to nearest, ties to even 
 // 																						01 - Round up (towards +inf)
 // 																						10 - Symmetric rounding (towards +/- 0)
 // 																						11 - Round down (towards -inf)
@@ -57,6 +57,8 @@ module FPAddSub(
 	wire [7:0] Eb ;				// PreAlign->Align: B's exponent
 	wire [24:0] Ma ;				// PreAlign->Align: A's mantissa
 	wire [24:0] Mb ;				// PreAlign->Align: B's mantissa
+	wire [22:0] MqNaN ;			// PreAlign->Exception: Mantissa for a NaN result
+	wire [6:0] InputExc ;		// PreAlign->Exception: Exceptions in Inputs
 	wire [7:0] CExp ;				// Align->Round: The (after alignment) common exponent
 	wire [24:0] Mmax ;			// Align->Execute: The larger mantissa
 	wire [24:0] Mmin ;			// Align->Execute: The smaller mantissa
@@ -69,11 +71,15 @@ module FPAddSub(
 	wire PSgn ;						// Execute->Round: Preliminary Sign of the result
 	wire Opr ;						// Execute->Normalize: The effective operation performed
 	wire [22:0] NormM ;			// Normalize->Round: The normalized result mantissa
-	wire [7:0] NormE ;			// Normalize->Round: The result exponent after normalization
-	wire [5:0] Shift ;			// Normalize->Round: Normalization shift amount
+	wire [8:0] NormE ;			// Normalize->Round: The result exponent after normalization
+	wire ZeroSum;					// Normalize->Exception: Normalized sum is zero
+	wire NegE;						// Normalize->Exception: Adjusted exponent is negative
+	wire PInexact ;				// Round->Exception: Inexact after rounding
+	wire [22:0] RoundM ;			// Round->Exception: Rounded mantissa
+	wire [8:0] RoundE ;			// Round->Exception: Rounded exponent
 	
 	// Prepare the operands for alignment and check for exceptions
-	FPAddSub_PreAlignModule PreAlignModule(A[31:0], B[31:0], Sa, Sb, Ea[7:0], Eb[7:0], Ma[24:0], Mb[24:0]) ;
+	FPAddSub_PreAlignModule PreAlignModule(A[31:0], B[31:0], Sa, Sb, Ea[7:0], Eb[7:0], Ma[24:0], Mb[24:0], InputExc[6:0], MqNaN[22:0]) ;
 	
 	// Align mantissas for execution and generate guard and presticky
 	FPAddSub_AlignModule	AlignModule(Ea[7:0], Eb[7:0], Ma[24:0], Mb[24:0], CExp[7:0], Mmax[24:0], Mmin[24:0], G, PS, MaxAB) ;
@@ -82,9 +88,13 @@ module FPAddSub(
 	FPAddSub_ExecuteModule ExecuteModule(Mmax[24:0], Mmin[24:0], Sa, Sb, MaxAB, Ctrl[0], G, PS, Sum[25:0], PSgn, Opr) ;
 
 	// Normalize the result and generate final round and sticky
-	FPAddSub_NormalizeModule NormalizeModule(Sum[25:0], CExp[7:0], G, PS, Opr, NormM[22:0], NormE[7:0], Shift[5:0], R, S) ;
+	FPAddSub_NormalizeModule NormalizeModule(Sum[25:0], CExp[7:0], G, PS, Opr, NormM[22:0], NormE[8:0], ZeroSum, NegE, R, S) ;
 	
 	// Round the result according to input, adjust for overflow and check for rounding errors 
-	FPAddSub_RoundModule RoundModule (PSgn, NormE[7:0], NormM[22:0], R, S, Ctrl[2:1], Z[31:0], Inexact) ;
-
+	FPAddSub_RoundModule RoundModule (PSgn, NormE[8:0], NormM[22:0], R, S, Ctrl[2:1], RoundM[22:0], RoundE[8:0], PInexact) ;
+	
+	// Adjust for exception cases, set exception flags and put together final result
+	FPAddSub_ExceptionModule ExceptionModule(RoundE[8:0], RoundM[22:0], Sa, Sb, MaxAB, 
+		InputExc[6:0], MqNaN[22:0], PInexact, ZeroSum, NegE, Opr, Ctrl[2:0], Z[31:0], Flags[4:0]) ;
+	
 endmodule

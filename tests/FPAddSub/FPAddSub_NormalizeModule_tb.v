@@ -33,8 +33,9 @@ module FPAddSub_NormalizeModule_tb;
 
 	// Outputs
 	wire [22:0] NormM;
-	wire [7:0] NormE;
-	wire [5:0] Shift;
+	wire [8:0] NormE;
+	wire ZeroSum;
+	wire NegE;
 	wire R;
 	wire S;
 
@@ -47,7 +48,8 @@ module FPAddSub_NormalizeModule_tb;
 		.Opr(Opr),
 		.NormM(NormM),
 		.NormE(NormE),
-		.Shift(Shift),
+		.ZeroSum(ZeroSum),
+		.NegE(NegE),
 		.R(R),
 		.S(S)
 	);

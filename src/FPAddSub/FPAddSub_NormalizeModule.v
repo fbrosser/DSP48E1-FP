@@ -4,7 +4,7 @@
 //
 // Create Date:    16:05:07 09/07/2012
 // Module Name:    FBAddSub_NormalizeModule
-// Project Name: 	 CHiPES Project
+// Project Name: 	 Floating Point Project
 // Author:			 Fredrik Brosser
 //
 // Description:	 Normalizes a given floating point number according to the
@@ -20,7 +20,8 @@ module FPAddSub_NormalizeModule(
 		Opr,
 		NormM,
 		NormE,
-		Shift,
+		ZeroSum,
+		NegE,
 		R,
 		S
     );
@@ -34,24 +35,28 @@ module FPAddSub_NormalizeModule(
 	
 	// Output ports
 	output [22:0] NormM ;				// Normalized mantissa
-	output [7:0] NormE ;					// Adjusted exponent
-	output [5:0] Shift ;					// Amount shifted
+	output [8:0] NormE ;					// Adjusted exponent
+	output ZeroSum ;						// Zero flag
+	output NegE ;							// Flag indicating negative exponent
 	output R ;								// Round bit
 	output S ;								// Final sticky bit
+
 	
 	// Internal signals
 	wire [25:0] PSSum ;					// The Pre-Shift-Sum
 	wire MSBShift ;						// Flag indicating that a second shift is needed
-	wire [7:0] ExpOF ;					// MSB set in sum indicates overflow
-	wire [7:0] ExpOK ;					// MSB not set, no adjustment
+	wire [8:0] ExpOF ;					// MSB set in sum indicates overflow
+	wire [8:0] ExpOK ;					// MSB not set, no adjustment
+	wire [5:0] Shift ;					// Amount to be shifted
 	
 	// Leading Nought Counter
 	FPAddSub_LNCModule LNCModule(Sum[25:0], Shift[5:0]) ;
 	
 	// Note that we might have to do another round of shifting
-	assign PSSum = Sum << Shift ;			// Perform right shift
-
+	assign PSSum = Sum << Shift ;	// Perform right shift
+	assign ZeroSum = ~|PSSum ;		// Check for all zero sum
 	assign ExpOK = CExp - Shift ;	// Adjust exponent for new normalized mantissa
+	assign NegE = ExpOK[8] ;		// Check for exponent overflow
 	assign ExpOF = ExpOK + 1 ;		// If MSB set, add one to exponent(x2)
 	assign MSBShift = PSSum[25] ;	// Check MSB in unnormalized sum
 	assign NormM = PSSum[24:2] ;	// The new, normalized mantissa

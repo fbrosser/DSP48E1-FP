@@ -4,7 +4,7 @@
 //
 // Create Date:    11:35:05 09/05/2012 
 // Module Name:    FPAddSub_ExecuteModule 
-// Project Name: 	 CHiPES Project
+// Project Name: 	 Floating Point Project
 // Author:			 Fredrik Brosser
 //
 // Description:	 Module that executes the addition or subtraction on mantissas.
@@ -51,7 +51,7 @@ module FPAddSub_ExecuteModule(
 	// DSP48E1: ALU
 	assign OpB = (Opr ? (~({1'b0, Mmin[24:0]})) : Mmin[24:0]) ; // Determine Operand B
 	
-	assign OpC	= Opr & ~(G | PS) ;	// Compute carry to compensate for 1's complement
+	assign OpC	= Opr & ~(G | PS) ;	// Compute carry to compensate for 2's complement
 	
 	// DSP48E1: ALU
 	assign Sum 	= (OpA + OpB + OpC) ;	// Compute actual sum

@@ -35,6 +35,8 @@ module FBAddSub_PreAlignModule_tb;
 	wire [7:0] Eb;
 	wire [24:0] Ma;
 	wire [24:0] Mb;
+	wire [6:0] InputExc;
+	wire [22:0] MqNaN;
 
 	// Instantiate the Unit Under Test (UUT)
 	FPAddSub_PreAlignModule uut (
@@ -45,7 +47,9 @@ module FBAddSub_PreAlignModule_tb;
 		.Ea(Ea), 
 		.Eb(Eb), 
 		.Ma(Ma), 
-		.Mb(Mb)
+		.Mb(Mb),
+		.InputExc(InputExc),
+		.MqNaN(MqNaN)
 	);
 
 	initial begin

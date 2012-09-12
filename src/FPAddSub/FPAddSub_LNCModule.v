@@ -4,7 +4,7 @@
 //
 // Create Date:    15:18:29 09/07/2012
 // Module Name:    FBAddSub_LNCModule 
-// Project Name: 	 CHiPES Project
+// Project Name: 	 Floating Point Project
 // Author:			 Fredrik Brosser
 //
 // Description:	 Leading Nought Counter - Module for counting the number of leading
