@@ -29,8 +29,8 @@ module FPMult_NormalizeModule_tb;
 	reg [8:0] E;
 
 	// Outputs
-	wire [47:0] NormM;
-	wire [7:0] NormE;
+	wire [22:0] NormM;
+	wire [8:0] NormE;
 	wire G;
 	wire R;
 	wire S;
@@ -63,6 +63,7 @@ module FPMult_NormalizeModule_tb;
 		#10 M = 48'b0100_0000_0000_0000_0000_0000_0100_0000_0000_0000_0000_0000; E = 8'b0000_0000;
 		#10 M = 48'b0100_0000_0000_0000_0000_0001_0000_0000_0000_0000_0000_0000; E = 8'b0000_0000;
 		#10 M = 48'b1100_0000_0000_0000_0000_0001_0100_0000_0000_0000_0000_0000; E = 8'b0000_0000;
+		#10 $finish;
 	end
       
 endmodule

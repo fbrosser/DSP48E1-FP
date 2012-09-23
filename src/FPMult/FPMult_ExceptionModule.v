@@ -10,20 +10,22 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module FPMult_ExceptionModule(
-			RoundE,
 			RoundM,
+			RoundE,
 			Sgn,
 			P
     );
 
 	// Input ports
-	input [23:0] RoundM ;
-	input [8:0] RoundE ;
-	input Sgn ;
+	input [22:0] RoundM ;							// Rounded mantissa
+	input [8:0] RoundE ;								// Rounded exponent
+	input Sgn ;											// Final sign
 	
 	// Output ports
-	output [31:0] P ;
+	output [31:0] P ;									// The product
 	
-	assign P = {Sgn & RoundE[7:0] & RoundM[22:0]} ;
+	// Add error checking here
+	
+	assign P = {Sgn, RoundE[7:0], RoundM} ;   // Putting the pieces together
 	
 endmodule

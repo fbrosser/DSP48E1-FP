@@ -19,17 +19,17 @@ module FPMult_ESExecuteModule(
     );
 
 	// Input Ports
-	input [7:0] Ea ;
-	input [7:0] Eb ;
-	input Sa ;
-	input Sb ;
+	input [7:0] Ea ;						// A's exponent
+	input [7:0] Eb ;						// B's exponent
+	input Sa ;								// A's sign
+	input Sb ;								// B's sign
 	
 	// Output ports
-	output [8:0] E ;
-	output Sp ;
+	output [8:0] Ep ;						// The product exponent
+	output Sp ;								// Product sign
 	
-	assign E = (Ea + Eb - 127) ;
+	assign Ep = (Ea + Eb - 127) ;		// Adding the exponents (adjusting for double bias)
 	
-	assign Sp = (Sa ^ Sb) ;
+	assign Sp = (Sa ^ Sb) ;				// Equal signs give a positive product
 
 endmodule

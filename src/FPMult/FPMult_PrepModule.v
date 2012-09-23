@@ -30,8 +30,8 @@ module FPMult_PrepModule(
 	output Sb ;										// B's sign
 	output [7:0] Ea ;								// A's exponent
 	output [7:0] Eb ;								// B's exponent
-	output [24:0] Ma ;							// A's mantissa (explicit 1)
-	output [24:0] Mb ;							// B's mantissa (explicit 1)
+	output [23:0] Ma ;							// A's mantissa (explicit 1)
+	output [23:0] Mb ;							// B's mantissa (explicit 1)
 	output [6:0] InputExc ;						// Input numbers are exceptions
 	
 	// Internal signals							// If signal is high...
@@ -73,7 +73,7 @@ module FPMult_PrepModule(
 	assign Sb = B[31] ;							// B's sign
 	assign Ea = (AEZEx ? 8'b1 : A[30:23]);	// Store A's exponent in Ea, unless A is an exception
 	assign Eb = (BEZEx ? 8'b1 : B[30:23]);	// Store B's exponent in Eb, unless B is an exception	
-	assign Ma = {~AEZEx, A[22:0], 1'b0} ;	// Prepend implicit 1 to A's mantissa and append 0 (unless exception)
-	assign Mb = {~BEZEx, B[22:0], 1'b0} ;	// Prepend implicit 1 to B's mantissa and append 0 (unless exception)
+	assign Ma = {~AEZEx, A[22:0]} ;			// Prepend implicit 1 to A's mantissa
+	assign Mb = {~BEZEx, B[22:0]} ;			// Prepend implicit 1 to B's mantissa
     
 endmodule

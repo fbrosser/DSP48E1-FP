@@ -20,32 +20,25 @@ module FPMult_NormalizeModule(
     );
 
 	// Input ports
-	input [47:0] M ;
-	input [8:0] E ;
+	input [47:0] M ;													// Unnormalized mantissa
+	input [8:0] E ;													// Unnormalized exponent
 	
 	// Output ports
-	output [47:0] NormM ;
-	output [8:0] NormE ;
-	output G ;
-	output R ;
-	output S ;
+	output [22:0] NormM ;											// Normalized mantissa
+	output [8:0] NormE ;												// Normalized exponent
+	output G ;															// Guard bit (M0)
+	output R ;															// Round bit
+	output S ;															// Sticky bit
 	
-	reg [47:0] NormM ;
-	reg [7:0] NormE ;	
+	// Internal signals
+	wire [47:0] ShiftedM ;											// The shifted mantissa
 	
-	always @(M) begin
-		if(M[47]) begin
-			NormM = M >> 1 ;
-			NormE = E + 1 ;
-		end
-		else begin
-			NormM = M ;
-			NormE = E ;
-		end
-	end
+	assign ShiftedM = M >> 1 ;										// Perform right shift
+	assign NormM = (M[47] ? ShiftedM[45:23] : M [45:23]); // Check for overflow
+	assign NormE = E + (M[47] ? 1 : 0) ;						// If so, increment exponent
 	
-	assign G =  NormM[24] ;
-	assign R =  NormM[23] ;
-	assign S = |NormM[22:0] ;
+	assign G =  M[24] ;												// Pick out guard bit
+	assign R =  M[23] ;												// Round bit (at cutoff)
+	assign S = |M[22:0] ;											// Sticky, OR of all the cutoff bits
 
 endmodule

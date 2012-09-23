@@ -16,12 +16,12 @@ module FPMult_ExecuteModule(
     );
 
 	// Input ports
-	input [23:0] Ma ;
-	input [23:0] Mb ;
+	input [23:0] Ma ;				// A's mantissa
+	input [23:0] Mb ;				// B's mantissa
 	
 	// Output ports
-	output [47:0] Mp ;
+	output [47:0] Mp ;			// Mantissa product
 	
-	assign Mp = Ma * Mb ;
+	assign Mp = Ma * Mb ;		// Calculate product (24x24 bit multiplication)
 	
 endmodule
