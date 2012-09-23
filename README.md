@@ -7,7 +7,7 @@ The project includes test fixtures for all individual modules.
 
 ###Structure
 ======
-	+ FPU									-- Top Module
+	+ FPU/									-- Top Module
 		- FPU_PrepModule					-- Pre-Alignment, exception checking and splitting of input.
 		+ FPMult/                           -- Multiplier top module
 			- FPAddSub_ESExecuteModule      -- Exponent and sign execution module
