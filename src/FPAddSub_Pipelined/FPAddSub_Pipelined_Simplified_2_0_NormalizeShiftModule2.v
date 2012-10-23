@@ -33,9 +33,9 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeShiftModule2(
 	always @(*) begin    // rotate {0 | 1 | 2 | 3} bits
 	  case (Shift[1:0])
 		  2'b00:  Lvl3 <= Stage2[25:0];       											// rotate by 0?
-		  2'b01: begin for (i=0; i<=25; i=i+1) begin Lvl3[i] <= Stage2[i-1]; end Lvl3[0] <= 0; end //Lvl3[i] <= (i < 24 ? Stage2[i+1] : 1'b0); 
-		  2'b10: begin for (i=0; i<=25; i=i+1) begin Lvl3[i] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end //Lvl3[i] <= (i < 23 ? Stage2[i+2] : 1'b0); 
-		  2'b11: begin for (i=0; i<=25; i=i+1) begin Lvl3[i] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end //Lvl3[i] <= (i < 22 ? Stage2[i+3] : 1'b0); 
+		  2'b01: begin for (i=51; i>=26; i=i-1) begin Lvl3[(i-26)] <= Stage2[i-1]; end Lvl3[0] <= 0; end //Lvl3[i] <= (i < 24 ? Stage2[i+1] : 1'b0); 
+		  2'b10: begin for (i=51; i>=26; i=i-1) begin Lvl3[i-26] <= Stage2[i-2]; end Lvl3[1:0] <= 0; end //Lvl3[i] <= (i < 23 ? Stage2[i+2] : 1'b0); 
+		  2'b11: begin for (i=51; i>=26; i=i-1) begin Lvl3[i-26] <= Stage2[i-3]; end Lvl3[2:0] <= 0; end //Lvl3[i] <= (i < 22 ? Stage2[i+3] : 1'b0); 
 	  endcase
 	end
 	

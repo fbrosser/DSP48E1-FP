@@ -185,9 +185,9 @@ module FPAddSub(
 	(
 		// Inputs
 		pipe_8[25:0],
+		pipe_8[27],
 		pipe_8[26],
-		pipe_8[25],
-		pipe_8[39:32],
+		pipe_8[40:33],
 		pipe_8[44],
 		pipe_8[50:46],
 		// Outputs
@@ -199,11 +199,28 @@ module FPAddSub(
 		S_8								// Final sticky bit
 	) ;
 		
+		
+			/* PIPE_9 :
+				[53] Ctrl
+				[52] PSgn_4
+				[51] Sa_0
+				[50] Sb_0
+				[49] MaxAB_0
+				[48:41] CExp_0
+				[40:36] InputExc_8
+				[35:13] NormM_8 
+				[12:4] NormE_8
+				[3] ZeroSum_8
+				[2] NegE_8
+				[1] R_8
+				[0] S_8
+			*/				
+			
 	// Round and put result together and check for exceptions
 	FPAddSub_Pipelines_Simplified_2_0_RoundModule RoundModule
 	(
 		// Inputs
-		pipe_9[3], pipe_9[42], pipe_9[2], pipe_9[12:4], pipe_9[35:13], pipe_9[1], pipe_9[0], pipe_9[41], pipe_9[42], pipe_9[30:26], pipe_9[43], pipe_9[39],
+		pipe_9[3], pipe_9[52], pipe_9[2], pipe_9[12:4], pipe_9[35:13], pipe_9[1], pipe_9[0], pipe_9[51], pipe_9[50], pipe_9[40:36], pipe_9[53], pipe_9[49],
 		// Outputs
 		Z_int[31:0],
 		Flags_int[4:0]	
@@ -212,15 +229,15 @@ module FPAddSub(
 	always @ (posedge clk) begin	
 		if(rst) begin
 			pipe_0 <= 0;
-			pipe_1 <= 0;
-			pipe_2 <= 0;
-			pipe_3 <= 0;
-			pipe_4 <= 0;
-			pipe_5 <= 0;
-			pipe_6 <= 0;
-			pipe_7 <= 0;
-			pipe_8 <= 0;
-			pipe_9 <= 0;
+			//pipe_1 <= 0;
+			///pipe_2 <= 0;
+			//pipe_3 <= 0;
+			//pipe_4 <= 0;
+			//pipe_5 <= 0;
+			//pipe_6 <= 0;
+			//pipe_7 <= 0;
+			//pipe_8 <= 0;
+			//pipe_9 <= 0;
 		end 
 		else begin
 		
@@ -231,7 +248,7 @@ module FPAddSub(
 			*/
 			pipe_0 <= {Ctrl, A, B} ;	
 			/* PIPE_1 :
-				[78] Sa_0
+				[78] Ctrl
 				[77] Sa_0
 				[76] Sb_0
 				[75] MaxAB_0
@@ -285,13 +302,13 @@ module FPAddSub(
 				[46] Ctrl
 				[45] PSgn_4
 				[44] Opr_4
-				[42] Sa_0
-				[41] Sb_0
-				[40] MaxAB_0
-				[39:32] CExp_0
-				[31:27] InputExc_0
-				[26] G_3
-				[25] PS_3
+				[43] Sa_0
+				[42] Sb_0
+				[41] MaxAB_0
+				[40:33] CExp_0
+				[32:28] InputExc_0
+				[27] G_3
+				[26] PS_3
 				[25:0] Sum_4
 			*/					
 			pipe_5 <= {pipe_4[78], PSgn_4, Opr_4, pipe_4[77:67], pipe_4[36:32], pipe_4[26:25], Sum_4[25:0]} ;	
@@ -300,13 +317,13 @@ module FPAddSub(
 				[50:46] Shift_5
 				[45] PSgn_4
 				[44] Opr_4
-				[42] Sa_0
-				[41] Sb_0
-				[40] MaxAB_0
-				[39:32] CExp_0
-				[31:27] InputExc_0
-				[26] G_3
-				[25] PS_3
+				[43] Sa_0
+				[42] Sb_0
+				[41] MaxAB_0
+				[40:33] CExp_0
+				[32:28] InputExc_0
+				[27] G_3
+				[26] PS_3
 				[25:0] Sum_5
 			*/					
 			pipe_6 <= {pipe_5[46], Shift_5[4:0], pipe_5[45:26], SumS_5[25:0]} ;	
@@ -315,13 +332,13 @@ module FPAddSub(
 				[50:46] Shift_5
 				[45] PSgn_4
 				[44] Opr_4
-				[42] Sa_0
-				[41] Sb_0
-				[40] MaxAB_0
-				[39:32] CExp_0
-				[31:27] InputExc_0
-				[26] G_3
-				[25] PS_3
+				[43] Sa_0
+				[42] Sb_0
+				[41] MaxAB_0
+				[40:33] CExp_0
+				[32:28] InputExc_0
+				[27] G_3
+				[26] PS_3
 				[25:0] Sum_6
 			*/					
 			pipe_7 <= {pipe_6[51:26], SumS_6[25:0]} ;	
@@ -330,15 +347,16 @@ module FPAddSub(
 				[50:46] Shift_5
 				[45] PSgn_4
 				[44] Opr_4
-				[42] Sa_0
-				[41] Sb_0
-				[40] MaxAB_0
-				[39:32] CExp_0
-				[31:27] InputExc_0
-				[26] G_3
-				[25] PS_3
+				[43] Sa_0
+				[42] Sb_0
+				[41] MaxAB_0
+				[40:33] CExp_0
+				[32:28] InputExc_0
+				[27] G_3
+				[26] PS_3
 				[25:0] Sum_7
-			*/					
+			*/				
+		
 			pipe_8 <= {pipe_7[51:26], SumS_7[25:0]} ;	
 			/* PIPE_9 :
 				[53] Ctrl
@@ -355,7 +373,7 @@ module FPAddSub(
 				[1] R_8
 				[0] S_8
 			*/					
-			pipe_9 <= {pipe_8[51], pipe_8[45], pipe_8[42:27], NormM_8[22:0], NormE_8[8:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
+			pipe_9 <= {pipe_8[51], pipe_8[45], pipe_8[43:28], NormM_8[22:0], NormE_8[8:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
 		
 			pipe_10 <= {Flags_int[4:0], Z_int[31:0]} ;	
 		end

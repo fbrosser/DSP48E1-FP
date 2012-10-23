@@ -40,7 +40,6 @@ module FPAddSub_Pipelined_Simplified_2_0_PreAlignModule(
 	output [4:0] InputExc ;						// Input numbers are exceptions
 	
 	// Internal signals							// If signal is high...
-	wire InExc ;									// One of the inputs is an exception
 	wire ANaN ;									// A is a signalling NaN
 	wire BNaN ;									// B is a signalling NaN
 	wire AInf ;										// A is infinity
@@ -58,6 +57,8 @@ module FPAddSub_Pipelined_Simplified_2_0_PreAlignModule(
 	// The difference between exponents
 	wire [7:0] DA ;							
 	wire [7:0] DB ;
+	wire BOF ;
+	wire AOF ;
 	
 	assign DA  = (A[30:23] - B[30:23]) ;
 	assign DB  = (B[30:23] - A[30:23]) ;
@@ -67,15 +68,19 @@ module FPAddSub_Pipelined_Simplified_2_0_PreAlignModule(
 	// B's sign	bit
 	assign Sb = B[31] ;							
 	// Determine the larger of A and B. 0/A, 1/B
-	assign MaxAB = (A[30:23] < B[30:23]) ;
-	
+	//assign MaxAB = (A[30:23] < B[30:23]) ;
+	assign MaxAB = (DA < 0) ;
+	assign BOF = DB < 26 ;
+	assign AOF = DA < 26 ;	
 	// Determine final shift value
-	assign Shift = MaxAB ? ((DB < 26) ? DB[4:0] : 5'b11001) : ((DA < 26) ? DA[4:0] : 5'b11001) ;
+	//assign Shift = MaxAB ? ((DB < 26) ? DB[4:0] : 5'b11001) : ((DA < 26) ? DA[4:0] : 5'b11001) ;
+	
+	assign Shift = MaxAB ? (BOF ? DB[4:0] : 5'b11001) : (AOF ? DA[4:0] : 5'b11001) ;
 	
 	// Take out smaller mantissa and append shift space
-	assign MminS = {(MaxAB ? {~|(A[22:0]), A[22:0], 1'b0} : {~|(B[22:0]), B[22:0], 1'b0}), 7'b0} ; 
+	assign MminS = {(MaxAB ? {1'b1, A[22:0], 1'b0} : {1'b1, B[22:0], 1'b0}), 7'b0} ; 
 	// Take out larger mantissa	
-	assign Mmax = (MaxAB ? {~|(B[22:0]), B[22:0], 1'b0}: {~|(A[22:0]), A[22:0], 1'b0}) ;	
+	assign Mmax = (MaxAB ? {1'b1, B[22:0], 1'b0}: {1'b1, A[22:0], 1'b0}) ;	
 	// Common exponent
 	assign CExp = (MaxAB ? B[30:23] : A[30:23]) ;									
 	

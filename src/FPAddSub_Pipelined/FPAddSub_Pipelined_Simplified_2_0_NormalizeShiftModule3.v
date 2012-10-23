@@ -62,7 +62,7 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeShiftModule3(
 	assign MSBShift = PSSum[25] ;	// Check MSB in unnormalized sum
 	assign NormM = PSSum[24:2] ;	// The new, normalized mantissa
 	
-	assign NormE = (MSBShift ? ExpOF : ExpOK) ;	// Determine final exponent
+	assign NormE = (ZeroSum ? 0 : (MSBShift ? ExpOF : ExpOK)) ;	// Determine final exponent
 	
 	// Also need to compute sticky and round bits for the rounding stage
 	assign CheckNorm = (Opr & (~|Shift[4:2]) & Shift[1] & ~Shift[0]);	// Really Normalized?

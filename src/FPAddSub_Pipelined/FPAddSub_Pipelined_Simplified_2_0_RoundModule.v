@@ -81,7 +81,7 @@ module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
 	assign Inexact = (R | S) | (Overflow & ~InputExc[0]) ;
 
 	// If zero, need to determine sign according to rounding
-	assign FSgn = (ZeroSum & (Sa ^ Sb)) | (ZeroSum ? (Sa & Sb & ~Ctrl) : (~MaxAB & Sa) | ((Ctrl ^ Sb) & (MaxAB | Sa))) ;
+	assign FSgn = (ZeroSum & (Sa ^ Sb)) | (ZeroSum ? (Sa & Sb & ~Ctrl) : ((~MaxAB & Sa) | ((Ctrl ^ Sb) & (MaxAB | Sa)))) ;
 	// Put pieces together to form final result
 	assign Z = {FSgn, RoundE[7:0], RoundM[22:0]} ;
 	// Collect exception flags	
