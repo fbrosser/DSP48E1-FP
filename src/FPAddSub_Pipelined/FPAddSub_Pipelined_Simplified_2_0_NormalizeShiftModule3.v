@@ -26,7 +26,10 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeShiftModule3(
 		Opr,
 		Shift,
 		NormM,
-		NormE,
+		//NormE,
+		ExpOK,
+		ExpOF,
+		MSBShift,
 		ZeroSum,
 		NegE,
 		R,
@@ -43,7 +46,7 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeShiftModule3(
 
 	// Output ports
 	output [22:0] NormM ;				// Normalized mantissa
-	output [8:0] NormE ;					// Adjusted exponent
+	//output [8:0] NormE ;					// Adjusted exponent
 	output ZeroSum ;						// Zero flag
 	output NegE ;							// Flag indicating negative exponent
 	output R ;								// Round bit
@@ -51,18 +54,22 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeShiftModule3(
 
 	// Internal signals
 	
-	wire MSBShift ;						// Flag indicating that a second shift is needed
-	wire [8:0] ExpOF ;					// MSB set in sum indicates overflow
-	wire [8:0] ExpOK ;					// MSB not set, no adjustment
+	//wire MSBShift ;						// Flag indicating that a second shift is needed
+	//wire [8:0] ExpOF ;					// MSB set in sum indicates overflow
+	//wire [8:0] ExpOK ;					// MSB not set, no adjustment
 	
-	assign ZeroSum = ~|PSSum ;		// Check for all zero sum
-	assign ExpOK = CExp - Shift ;	// Adjust exponent for new normalized mantissa
-	assign NegE = ExpOK[8] ;		// Check for exponent overflow
+	output MSBShift ;						// Flag indicating that a second shift is needed
+	output [8:0] ExpOF ;					// MSB set in sum indicates overflow
+	output [8:0] ExpOK ;					// MSB not set, no adjustment
+	
+	assign ZeroSum = ~|PSSum ;			// Check for all zero sum
+	assign ExpOK = CExp - Shift ;		// Adjust exponent for new normalized mantissa
+	assign NegE = ExpOK[8] ;			// Check for exponent overflow
 	assign ExpOF = ExpOK + 1'b1 ;		// If MSB set, add one to exponent(x2)
-	assign MSBShift = PSSum[25] ;	// Check MSB in unnormalized sum
-	assign NormM = PSSum[24:2] ;	// The new, normalized mantissa
+	assign MSBShift = PSSum[25] ;		// Check MSB in unnormalized sum
+	assign NormM = PSSum[24:2] ;		// The new, normalized mantissa
 	
-	assign NormE = (ZeroSum ? 0 : (MSBShift ? ExpOF : ExpOK)) ;	// Determine final exponent
+	
 	
 	// Also need to compute sticky and round bits for the rounding stage
 	assign CheckNorm = (Opr & (~|Shift[4:2]) & Shift[1] & ~Shift[0]);	// Really Normalized?

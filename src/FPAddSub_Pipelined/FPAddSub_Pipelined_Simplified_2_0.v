@@ -62,7 +62,7 @@ module FPAddSub(
 	reg [51:0] pipe_6;// = 0;			// Pipeline register Nomalize->NormalizeShift1
 	reg [51:0] pipe_7;// = 0;			// Pipeline register NormalizeShift1->NormalizeShift2
 	reg [51:0] pipe_8;// = 0;			// Pipeline register NormalizeShift2->NormalizeShift3
-	reg [53:0] pipe_9;// = 0;			// Pipeline register NormalizeShift3->Round
+	reg [63:0] pipe_9;// = 0;			// Pipeline register NormalizeShift3->Round
 	reg [36:0] pipe_10;// = 0;			// Pipeline register NormalizeShift3->Round
 	
 	// Internal wires between modules
@@ -90,13 +90,17 @@ module FPAddSub(
 	
 	wire [4:0] Shift_5 ;							// Number of steps to shift sum left (normalize)
 	wire [25:0] SumS_5 ;							// Sum after 0/16 shift
-	
+
 	wire [25:0] SumS_6 ;							// Sum after 0/16 shift
 	
 	wire [25:0] SumS_7 ;							// Sum after 0/16 shift
 	
 	wire [22:0] NormM_8 ;							// Normalized mantissa
-	wire [8:0] NormE_8;							// Adjusted exponent
+	//wire [8:0] NormE_8;							// Adjusted exponent
+	wire [8:0] ExpOK_8 ;							//  exponent
+	wire [8:0] ExpOF_8 ;							//  exponent
+	wire MSBShift_8 ;
+	
 	wire ZeroSum_8 ;								// Zero flag
 	wire NegE_8 ;									// Flag indicating negative exponent
 	wire R_8 ;										// Round bit
@@ -157,7 +161,7 @@ module FPAddSub(
 	FPAddSub_Pipelined_Simplified_2_0_NormalizeModule NormalizeModule
 	(
 		// Inputs
-		pipe_5[25:0],
+		pipe_5[25:0], 
 		// Outputs
 		SumS_5[25:0], Shift_5[4:0]
 		) ;
@@ -192,35 +196,38 @@ module FPAddSub(
 		pipe_8[50:46],
 		// Outputs
 		NormM_8[22:0],					// Normalized mantissa
-		NormE_8[8:0],					// Adjusted exponent
+		//NormE_8[8:0],					// Adjusted exponent
+		ExpOK_8[8:0], 
+		ExpOF_8[8:0],
+		MSBShift_8,
 		ZeroSum_8,						// Zero flag
 		NegE_8,							// Flag indicating negative exponent
 		R_8,								// Round bit
 		S_8								// Final sticky bit
 	) ;
 		
-		
-			/* PIPE_9 :
-				[53] Ctrl
-				[52] PSgn_4
-				[51] Sa_0
-				[50] Sb_0
-				[49] MaxAB_0
-				[48:41] CExp_0
-				[40:36] InputExc_8
-				[35:13] NormM_8 
-				[12:4] NormE_8
+					/* PIPE_9 NEW:
+				[63] MSBShift_8
+				[62] Ctrl
+				[61] PSgn_4
+				[60] Sa_0
+				[59] Sb_0
+				[58] MaxAB_0
+				[57:50] CExp_0
+				[49:45] InputExc_8
+				[44:22] NormM_8
+				[21:13] ExpOK 
+				[12:4] ExpOF
 				[3] ZeroSum_8
 				[2] NegE_8
 				[1] R_8
 				[0] S_8
-			*/				
-			
+			*/		
 	// Round and put result together and check for exceptions
 	FPAddSub_Pipelines_Simplified_2_0_RoundModule RoundModule
 	(
 		// Inputs
-		pipe_9[3], pipe_9[52], pipe_9[2], pipe_9[12:4], pipe_9[35:13], pipe_9[1], pipe_9[0], pipe_9[51], pipe_9[50], pipe_9[40:36], pipe_9[53], pipe_9[49],
+		pipe_9[63], pipe_9[21:13], pipe_9[12:4], pipe_9[3], pipe_9[52], pipe_9[2], pipe_9[35:13], pipe_9[1], pipe_9[0], pipe_9[51], pipe_9[50], pipe_9[40:36], pipe_9[53], pipe_9[49],
 		// Outputs
 		Z_int[31:0],
 		Flags_int[4:0]	
@@ -358,7 +365,7 @@ module FPAddSub(
 			*/				
 		
 			pipe_8 <= {pipe_7[51:26], SumS_7[25:0]} ;	
-			/* PIPE_9 :
+			/* PIPE_9 OLD:
 				[53] Ctrl
 				[52] PSgn_4
 				[51] Sa_0
@@ -372,8 +379,25 @@ module FPAddSub(
 				[2] NegE_8
 				[1] R_8
 				[0] S_8
-			*/					
-			pipe_9 <= {pipe_8[51], pipe_8[45], pipe_8[43:28], NormM_8[22:0], NormE_8[8:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
+			*/	
+			/* PIPE_9 NEW:
+				[63] MSBShift_8
+				[62] Ctrl
+				[61] PSgn_4
+				[60] Sa_0
+				[59] Sb_0
+				[58] MaxAB_0
+				[57:50] CExp_0
+				[49:45] InputExc_8
+				[44:22] NormM_8
+				[21:13] ExpOK 
+				[12:4] ExpOF
+				[3] ZeroSum_8
+				[2] NegE_8
+				[1] R_8
+				[0] S_8
+			*/							
+			pipe_9 <= {MSBShift_8, pipe_8[51], pipe_8[45], pipe_8[43:28], NormM_8[22:0], ExpOK_8[8:0], ExpOF_8[8:0], ZeroSum_8, NegE_8, R_8, S_8} ;	
 		
 			pipe_10 <= {Flags_int[4:0], Z_int[31:0]} ;	
 		end

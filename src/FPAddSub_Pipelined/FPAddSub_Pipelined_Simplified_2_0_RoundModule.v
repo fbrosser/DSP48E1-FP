@@ -13,10 +13,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
+		MSBShift,
+		ExpOK,
+		ExpOF,
 		ZeroSum,
 		Sgn,
 		NegE,
-		NormE,
+		//NormE,
 		NormM,
 		R,
 		S,
@@ -30,10 +33,13 @@ module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
     );
 
 	// Input ports
+	input MSBShift ;
+	input ExpOK ;
+	input ExpOF ;
 	input ZeroSum ;					// Sum is zero
 	input Sgn ;							// Final sign
 	input NegE ;						// Negative exponent?
-	input [8:0] NormE ;				// Normalized exponent
+	//input [8:0] NormE ;				// Normalized exponent
 	input [22:0] NormM ;				// Normalized mantissa
 	input R ;							// Round bit
 	input S ;							// Sticky bit
@@ -53,6 +59,10 @@ module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
 	wire RoundUp ;						// Flag indicating that the sum should be rounded up
 	wire ExpAdd ;						// May have to add 1 to compensate for overflow 
 	wire RoundOF ;						// Rounding overflow
+	
+	wire [8:0] NormE ;				// Normalized exponent
+	
+	assign NormE = (ZeroSum ? 0 : (MSBShift ? ExpOF : ExpOK)) ;	// Determine final exponent
 	
 	// The cases where we need to round upwards (= adding one) in Round to nearest, tie to even
 	assign RoundUp = 	(R & (S | NormM[0])) ;
