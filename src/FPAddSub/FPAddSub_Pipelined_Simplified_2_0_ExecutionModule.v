@@ -11,7 +11,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module FPAddSub_ExecuteModule(
+module FPAddSub_Pipelined_Simplified_2_0_ExecutionModule(
 		Mmax,
 		Mmin,
 		Sa,
@@ -39,22 +39,15 @@ module FPAddSub_ExecuteModule(
 	output [25:0] Sum ;					// The result of the operation
 	output PSgn ;							// The sign for the result
 	output Opr ;							// The effective (performed) operation
-	
-	// Internal signals
-	wire [24:0] OpA ;						// Operand A for add/sub
-	wire [26:0] OpB ;						// Operand B for add/sub
-	wire OpC ;								// Operand C (carry)
-	
+
 	assign Opr = (OpMode^Sa^Sb); 		// Resolve sign to determine operation
-	assign OpA = Mmax;					// Operand A is simply the larger mantissa
-	
-	// DSP48E1: ALU
-	assign OpB = (Opr ? (~({1'b0, Mmin[24:0]})) : Mmin[24:0]) ; // Determine Operand B
-	
-	assign OpC	= Opr & ~(G | PS) ;	// Compute carry to compensate for 2's complement
-	
-	// DSP48E1: ALU
-	assign Sum 	= (OpA + OpB + OpC) ;	// Compute actual sum
+
+	// Operand A is simply the larger mantissa
+	// Operand B is positive if the effective operation is addition, otherwise negated
+	// Operand C is the effective operation performed, compensated for 2's complement
+	assign Sum 	= (Mmax + 
+						((OpMode^Sa^Sb) ? (~({1'b0, Mmin[24:0]})) : Mmin[24:0]) + 
+						(Opr & ~(G | PS))) ;	// Compute actual sum
 	
 	assign PSgn = (MaxAB ? Sb : Sa) ;		// Assign result sign
 

@@ -24,10 +24,14 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeModule(
 	output [25:0] Mmin ;
 	output [4:0] Shift ;
 
+	wire ZeroSum;
+	
+	assign ZeroSum = ~Sum[25:0];
+
 	// Leading Nought Counter
 	//FPAddSub_Pipelined_Simplified_2_0_LNCModule LNCModule(Sum[25:0], Shift[4:0]) ;
 	
-	assign Shift = ( 
+	assign Shift = ZeroSum ? 5'b00000 : ( 
 		Sum[25] ? 5'b00000 :	 
 		Sum[24] ? 5'b00001 : 
 		Sum[23] ? 5'b00010 : 
@@ -63,7 +67,6 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeModule(
 	end
 	
 	// Assign outputs
-	assign Mmin = Lvl1;						// Take out smaller mantissa			
-	
+	assign Mmin = Lvl1;						// Take out smaller mantissa
 
 endmodule

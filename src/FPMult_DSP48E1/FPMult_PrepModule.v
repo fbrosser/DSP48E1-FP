@@ -12,16 +12,15 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module FPAddSub_Pipelined_Simplified_2_0_PreAlignModule(
+module FPMult_PrepModule (
 		A,
 		B,
 		Sa,
 		Sb,
-		CExp,
-		MaxAB,
-		Shift,
-		MminS,
-		Mmax,
+		Ea,
+		Eb,
+		Ma,
+		Mb,
 		InputExc
 	);
 	
@@ -32,11 +31,10 @@ module FPAddSub_Pipelined_Simplified_2_0_PreAlignModule(
 	// Output ports
 	output Sa ;										// A's sign
 	output Sb ;										// B's sign
-	output [7:0] CExp ;									// Common Exponent
-	output MaxAB ;									// Indicates the larger of A and B(0/A, 1/B)
-	output [4:0] Shift ;							// Number of steps to smaller mantissa shift right
-	output [31:0] MminS ;						// Smaller mantissa after 0/16 shift
-	output [24:0] Mmax ;							// Larger mantissa
+	output [7:0] Ea ;								// A's exponent
+	output [7:0] Eb ;								// B's exponent
+	output [23:0] Ma ;							// A's mantissa (explicit 1)
+	output [23:0] Mb ;							// B's mantissa (explicit 1)
 	output [4:0] InputExc ;						// Input numbers are exceptions
 	
 	// Internal signals							// If signal is high...
@@ -52,36 +50,13 @@ module FPAddSub_Pipelined_Simplified_2_0_PreAlignModule(
 	
 	// Check for any exceptions and put all flags into exception vector
 	assign InputExc = {(ANaN | BNaN | AInf | BInf), ANaN, BNaN, AInf, BInf} ;
-	
-	// Internal signals
-	// The difference between exponents
-	wire [7:0] DA ;							
-	wire [7:0] DB ;
-	wire BOF ;
-	wire AOF ;
-	
-	assign DA  = (A[30:23] - B[30:23]) ;
-	assign DB  = (B[30:23] - A[30:23]) ;
-	
-	// A's sign bit
-	assign Sa = A[31] ;		
-	// B's sign	bit
-	assign Sb = B[31] ;							
-	// Determine the larger of A and B. 0/A, 1/B
-	//assign MaxAB = (A[30:23] < B[30:23]) ;
-	assign MaxAB = (DA < 0) ;
-	assign BOF = DB < 26 ;
-	assign AOF = DA < 26 ;	
-	// Determine final shift value
-	//assign Shift = MaxAB ? ((DB < 26) ? DB[4:0] : 5'b11001) : ((DA < 26) ? DA[4:0] : 5'b11001) ;
-	
-	assign Shift = MaxAB ? (BOF ? DB[4:0] : 5'b11001) : (AOF ? DA[4:0] : 5'b11001) ;
-	
-	// Take out smaller mantissa and append shift space
-	assign MminS = {(MaxAB ? {1'b1, A[22:0], 1'b0} : {1'b1, B[22:0], 1'b0}), 7'b0} ; 
-	// Take out larger mantissa	
-	assign Mmax = (MaxAB ? {1'b1, B[22:0], 1'b0}: {1'b1, A[22:0], 1'b0}) ;	
-	// Common exponent
-	assign CExp = (MaxAB ? B[30:23] : A[30:23]) ;									
-	
+
+	// Take input numbers apart
+	assign Sa = A[31] ;							// A's sign
+	assign Sb = B[31] ;							// B's sign
+	assign Ea = (A[30:23]);	// Store A's exponent in Ea, unless A is an exception
+	assign Eb = (B[30:23]);	// Store B's exponent in Eb, unless B is an exception	
+	assign Ma = {1'b1, A[22:0]} ;			// Prepend implicit 1 to A's mantissa
+	assign Mb = {1'b1, B[22:0]} ;			// Prepend implicit 1 to B's mantissa
+    
 endmodule

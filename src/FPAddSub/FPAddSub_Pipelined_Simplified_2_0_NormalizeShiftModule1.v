@@ -25,7 +25,7 @@ module FPAddSub_Pipelined_Simplified_2_0_NormalizeShiftModule1(
 	reg	  [25:0]		Lvl2 = 0;
 	wire    [51:0]    Stage1;	
 	integer           i;               // loop variables
-	
+
 	assign Stage1 = {MminP, MminP};
 
 	always @(*) begin    // rotate {0 | 4 | 8 | 12} bits

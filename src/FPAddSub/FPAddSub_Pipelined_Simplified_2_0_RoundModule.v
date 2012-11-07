@@ -13,13 +13,13 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
-		MSBShift,
-		ExpOK,
-		ExpOF,
+		//MSBShift,
+		//ExpOK,
+		//ExpOF,
 		ZeroSum,
 		Sgn,
 		NegE,
-		//NormE,
+		NormE,
 		NormM,
 		R,
 		S,
@@ -33,13 +33,13 @@ module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
     );
 
 	// Input ports
-	input MSBShift ;
-	input ExpOK ;
-	input ExpOF ;
+	//input MSBShift ;
+	//input [8:0] ExpOK ;
+	//input [8:0] ExpOF ;
 	input ZeroSum ;					// Sum is zero
 	input Sgn ;							// Final sign
 	input NegE ;						// Negative exponent?
-	//input [8:0] NormE ;				// Normalized exponent
+	input [8:0] NormE ;				// Normalized exponent
 	input [22:0] NormM ;				// Normalized mantissa
 	input R ;							// Round bit
 	input S ;							// Sticky bit
@@ -60,9 +60,9 @@ module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
 	wire ExpAdd ;						// May have to add 1 to compensate for overflow 
 	wire RoundOF ;						// Rounding overflow
 	
-	wire [8:0] NormE ;				// Normalized exponent
+	//wire [8:0] NormE ;				// Normalized exponent
 	
-	assign NormE = (ZeroSum ? 0 : (MSBShift ? ExpOF : ExpOK)) ;	// Determine final exponent
+	//assign NormE = (ZeroSum ? 0 : (MSBShift ? ExpOF[8:0] : ExpOK[8:0])) ;	// Determine final exponent
 	
 	// The cases where we need to round upwards (= adding one) in Round to nearest, tie to even
 	assign RoundUp = 	(R & (S | NormM[0])) ;
@@ -72,8 +72,8 @@ module FPAddSub_Pipelines_Simplified_2_0_RoundModule(
 	assign RoundOF = RoundUp & RoundUpM[23] ; 				// Check for overflow when rounding up
 	assign RoundM = (RoundUp ? RoundUpM[22:0] : NormM) ; 	// Compute final mantissa	
 
-	assign ExpAdd = (RoundOF ? 1'b1 : 1'b0) ; 						// Add 1 to exponent to compensate for overflow
-	assign RoundE = (NormE + ExpAdd) ; 							// Final exponent
+	assign ExpAdd = (RoundOF ? 1'b1 : 1'b0) ; 				// Add 1 to exponent to compensate for overflow
+	assign RoundE = ZeroSum ? 8'b00000000 : (NormE + ExpAdd) ; 							// Final exponent
 
 	// Internal signals
 	wire FSgn ;
