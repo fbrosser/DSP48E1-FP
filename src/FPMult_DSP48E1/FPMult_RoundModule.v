@@ -39,7 +39,7 @@ module FPMult_RoundModule(
 	wire [8:0] RoundE ;									// Rounded exponent
 	wire [8:0] RoundEP;
 	wire [23:0] PreShiftM;
-	wire [23:0] NormMP;								// Mantissa before shifting
+	wire [23:0] NormMP;									// Mantissa before shifting
 	wire MOz;
 	
 	assign MOz = &NormM;

@@ -38,15 +38,15 @@ module FPMult_PrepModule (
 	output [4:0] InputExc ;						// Input numbers are exceptions
 	
 	// Internal signals							// If signal is high...
-	wire ANaN ;									// A is a signalling NaN
-	wire BNaN ;									// B is a signalling NaN
+	wire ANaN ;										// A is a signalling NaN
+	wire BNaN ;										// B is a signalling NaN
 	wire AInf ;										// A is infinity
 	wire BInf ;										// B is infinity
 	
 	assign ANaN = &(A[30:23]) & |(A[30:23]) ;			// All one exponent and not all zero mantissa - NaN
 	assign BNaN = &(B[30:23]) & |(B[22:0]);			// All one exponent and not all zero mantissa - NaN
-	assign AInf = &(A[30:23]) & ~|(A[30:23]) ;				// All one exponent and all zero mantissa - Infinity
-	assign BInf = &(B[30:23]) & ~|(B[30:23]) ;				// All one exponent and all zero mantissa - Infinity
+	assign AInf = &(A[30:23]) & ~|(A[30:23]) ;		// All one exponent and all zero mantissa - Infinity
+	assign BInf = &(B[30:23]) & ~|(B[30:23]) ;		// All one exponent and all zero mantissa - Infinity
 	
 	// Check for any exceptions and put all flags into exception vector
 	assign InputExc = {(ANaN | BNaN | AInf | BInf), ANaN, BNaN, AInf, BInf} ;
@@ -54,9 +54,9 @@ module FPMult_PrepModule (
 	// Take input numbers apart
 	assign Sa = A[31] ;							// A's sign
 	assign Sb = B[31] ;							// B's sign
-	assign Ea = (A[30:23]);	// Store A's exponent in Ea, unless A is an exception
-	assign Eb = (B[30:23]);	// Store B's exponent in Eb, unless B is an exception	
-	assign Ma = {1'b1, A[22:0]} ;			// Prepend implicit 1 to A's mantissa
-	assign Mb = {1'b1, B[22:0]} ;			// Prepend implicit 1 to B's mantissa
+	assign Ea = (A[30:23]);						// Store A's exponent in Ea, unless A is an exception
+	assign Eb = (B[30:23]);						// Store B's exponent in Eb, unless B is an exception	
+	assign Ma = {1'b1, A[22:0]} ;				// Prepend implicit 1 to A's mantissa
+	assign Mb = {1'b1, B[22:0]} ;				// Prepend implicit 1 to B's mantissa
     
 endmodule

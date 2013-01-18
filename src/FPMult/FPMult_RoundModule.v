@@ -10,36 +10,43 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module FPMult_RoundModule(
-		NormM,
-		NormE,
-		G,
-		R,
-		S,
 		RoundM,
-		RoundE
+		RoundMP,
+		RoundE,
+		RoundEP,
+		Sp,
+		GRS,
+		InputExc,
+		Z,
+		Flags
     );
 
 	// Input Ports
-	input [22:0] NormM ;									// Normalized mantissa
-	input [8:0] NormE ;									// Normalized exponent
-	input G ;												// Guard bit
-	input R ;												// Round bit
-	input S ;												// Sticky bit
+	input [23:0] RoundM ;									// Normalized mantissa
+	input [23:0] RoundMP ;									// Normalized exponent
+	input [8:0] RoundE ;									// Normalized mantissa + 1
+	input [8:0] RoundEP ;									// Normalized exponent + 1
+	input Sp ;												// Product sign
+	input GRS ;
+	input [4:0] InputExc ;
 	
 	// Output Ports
-	output [22:0] RoundM ;								// Rounded mantissa
-	output [8:0] RoundE ;								// Rounded exponent
+	output [31:0] Z ;										// Final product
+	output [4:0] Flags ;
 	
 	// Internal Signals
-	wire [23:0] PreShiftM;								// Mantissa before shifting
-	wire [23:0] ShiftedM ;								// The shifted mantissa
+	wire [8:0] FinalE ;									// Rounded exponent
+	wire [23:0] FinalM;
+	wire [23:0] PreShiftM;
 	
-	assign PreShiftM = NormM + ((R&(G|S)) ? 1 : 0) ;	// Round up if R and (G or S)
+	assign PreShiftM = GRS ? RoundMP : RoundM ;	// Round up if R and (G or S)
 	
-	// Post rounding normalization (potential one bit shift)
-	assign ShiftedM = PreShiftM >> 1;				// Shift mantissa right
+	// Post rounding normalization (potential one bit shift> use shifted mantissa if there is overflow)
+	assign FinalM = (PreShiftM[23] ? {1'b0, PreShiftM[23:1]} : PreShiftM[23:0]) ;
 	
-	assign RoundM = (PreShiftM[23] ? ShiftedM[22:0] : PreShiftM[22:0]) ; // Use shifted mantissa if there is overflow
-	assign RoundE = NormE + (PreShiftM[23] ? 1 : 0) ; // Increment exponent if a shift was done
+	assign FinalE = (PreShiftM[23] ? RoundEP : RoundE) ; // Increment exponent if a shift was done
+	
+	assign Z = {Sp, FinalE[7:0], FinalM[22:0]} ;   // Putting the pieces together
+	assign Flags = InputExc[4:0];
 
 endmodule

@@ -36,6 +36,7 @@ module FPAddSub_ExceptionModule(
 	output [4:0] Flags ;				// Exception flags
 	
 	// Internal signals
+	wire FSgn ;
 	wire Overflow ;					// Overflow flag
 	wire Underflow ;					// Underflow flag
 	wire DivideByZero ;				// Divide-by-Zero flag (always 0 in Add/Sub)
@@ -54,7 +55,7 @@ module FPAddSub_ExceptionModule(
 	assign DivideByZero = &(Z[30:23]) & ~|(Z[30:23]) & ~InputExc[1] & ~InputExc[0];
 	
 	// Invalid inputs or operation
-	assign Invalid = |(InputExc[4:2]) ;
+	assign Invalid = |InputExc[4:2] ;
 	
 	// Inexact answer due to rounding, overflow or underflow
 	assign Inexact = (R | S) | Overflow | Underflow;

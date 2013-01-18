@@ -1,79 +1,67 @@
 `timescale 1ns / 1ps
-
 //////////////////////////////////////////////////////////////////////////////////
 //
-// Create Date:    12:26:15 09/20/2012
-// Module Name:    FPMult_PrepModule 
+// Create Date:    16:49:15 10/16/2012 
+// Module Name:    FPAddSub_Pipelined_Simplified_2_0_PreAlignModule 
 // Project Name: 	 Floating Point Project
 // Author:			 Fredrik Brosser
 //
+// Description:	 The pre-alignment module is responsible for taking the inputs
+//							apart, checking the parts for exceptions and feeding them to
+//							the alignment module.
+//
 //////////////////////////////////////////////////////////////////////////////////
 
-module FPMult_PrepModule(
-		A,
-		B,
+ module FPMult_PrepModule (
+		clk,
+		rst,
+		a,
+		b,
 		Sa,
 		Sb,
 		Ea,
 		Eb,
-		Ma,
-		Mb,
+		Mp,
 		InputExc
 	);
 	
 	// Input ports
-	input [31:0] A ;								// Input A, a 32-bit floating point number
-	input [31:0] B ;								// Input B, a 32-bit floating point number
+	input clk ;
+	input rst ;
+	input [31:0] a ;								// Input A, a 32-bit floating point number
+	input [31:0] b ;								// Input B, a 32-bit floating point number
 	
 	// Output ports
 	output Sa ;										// A's sign
 	output Sb ;										// B's sign
 	output [7:0] Ea ;								// A's exponent
 	output [7:0] Eb ;								// B's exponent
-	output [23:0] Ma ;							// A's mantissa (explicit 1)
-	output [23:0] Mb ;							// B's mantissa (explicit 1)
-	output [6:0] InputExc ;						// Input numbers are exceptions
+	output [47:0] Mp ;							// Mantissa product
+	output [4:0] InputExc ;						// Input numbers are exceptions
 	
 	// Internal signals							// If signal is high...
-	wire InExc ;									// One of the inputs is an exception
-	wire AEZEx ;									// All-zero exponent in A
-	wire BEZEx ;									// All-zero exponent in B
-	wire AEOEx ;									// All-one exponent in A
-	wire BEOEx ;									// All-one exponent in B
-	wire AMZEx ;									// All-zero mantissa in A
-	wire BMZEx ;									// All-zero mantissa in B
-	wire AqNaN ;									// A is a quiet NaN
-	wire BqNaN ;									// B is a quiet NaN
-	wire AsNaN ;									// A is a signalling NaN
-	wire BsNaN ;									// B is a signalling NaN
+	wire ANaN ;										// A is a signalling NaN
+	wire BNaN ;										// B is a signalling NaN
 	wire AInf ;										// A is infinity
 	wire BInf ;										// B is infinity
+	wire [47:0] PCOUT1 ;
 	
-	// Exception checking
-	assign AEZEx = ~|(A[30:23]) ;				// Check for all-zero exponent in A
-	assign BEZEx = ~|(B[30:23]) ;				// Check for all-zero exponent in B
-	assign AEOEx = &(A[30:23]) ; 				// Check for all-one exponent in A
-	assign BEOEx = &(B[30:23]) ;				// Check for all-one exponent in B
-	assign AMZEx = ~|(A[22:0]) ;				// Check for all-zero mantissa in A
-	assign BMZEx = ~|(A[22:0]) ;				// Check for all-zero mantissa in A
 	
-	assign AqNaN = AEOEx & ~AMZEx ;			// All one exponent and not all zero mantissa - Quiet NaN
-	assign BqNaN = BEOEx & ~BMZEx ;			// All one exponent and not all zero mantissa - Quiet NaN
-	assign AsNaN = AqNaN & ~A[22] ;			// All one exponent and not all zero mantissa and mantissa MSB zero- Signalling NaN
-	assign BsNaN = BqNaN & ~B[22] ;			// All one exponent and not all zero mantissa and mantissa MSB zero - Signalling NaN
-	assign AInf = AEOEx & AMZEx ;				// All one exponent and all zero mantissa - Infinity
-	assign BInf = BEOEx & BMZEx ;				// All one exponent and all zero mantissa - Infinity
+	assign ANaN = &(a[30:23]) & |(a[30:23]) ;			// All one exponent and not all zero mantissa - NaN
+	assign BNaN = &(b[30:23]) & |(b[22:0]);			// All one exponent and not all zero mantissa - NaN
+	assign AInf = &(a[30:23]) & ~|(a[30:23]) ;		// All one exponent and all zero mantissa - Infinity
+	assign BInf = &(b[30:23]) & ~|(b[30:23]) ;		// All one exponent and all zero mantissa - Infinity
 	
 	// Check for any exceptions and put all flags into exception vector
-	assign InExc = (AqNaN | BqNaN | AsNaN | BsNaN | AInf | BInf) ; 
-	assign InputExc = {InExc, AqNaN, BqNaN, AsNaN, BsNaN, AInf, BInf} ;
+	assign InputExc = {(ANaN | BNaN | AInf | BInf), ANaN, BNaN, AInf, BInf} ;
+	//assign InputExc = {(ANaN | ANaN | BNaN |BNaN), ANaN, ANaN, BNaN,BNaN} ;
 	
 	// Take input numbers apart
-	assign Sa = A[31] ;							// A's sign
-	assign Sb = B[31] ;							// B's sign
-	assign Ea = (AEZEx ? 8'b1 : A[30:23]);	// Store A's exponent in Ea, unless A is an exception
-	assign Eb = (BEZEx ? 8'b1 : B[30:23]);	// Store B's exponent in Eb, unless B is an exception	
-	assign Ma = {~AEZEx, A[22:0]} ;			// Prepend implicit 1 to A's mantissa
-	assign Mb = {~BEZEx, B[22:0]} ;			// Prepend implicit 1 to B's mantissa
-    
+	assign Sa = a[31] ;							// A's sign
+	assign Sb = b[31] ;							// B's sign
+	assign Ea = (a[30:23]);						// Store A's exponent in Ea, unless A is an exception
+	assign Eb = (b[30:23]);						// Store B's exponent in Eb, unless B is an exception	
+	
+	assign Mp = ({7'b0000001, a[22:0]}*{12'b0000000000001, b[22:17]}) ;
+
 endmodule

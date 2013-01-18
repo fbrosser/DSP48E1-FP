@@ -24,8 +24,8 @@ module FPAddSub_ExecutionModule(
     );
 
 	// Input ports
-	input [24:0] Mmax ;					// The larger mantissa
-	input [24:0] Mmin ;					// The smaller mantissa
+	input [22:0] Mmax ;					// The larger mantissa
+	input [23:0] Mmin ;					// The smaller mantissa
 	input Sa ;								// Sign bit of larger number
 	input Sb ;								// Sign bit of smaller number
 	input MaxAB ;							// Indicates the larger number (0/A, 1/B)
@@ -39,7 +39,7 @@ module FPAddSub_ExecutionModule(
 	assign Opr = (OpMode^Sa^Sb); 		// Resolve sign to determine operation
 
 	// Perform effective operation
-	assign Sum = Opr ? ({Mmax, 7'b0} - {Mmin, 7'b0}) : ({Mmax, 7'b0} + {Mmin, 7'b0}) ;
+	assign Sum = (OpMode^Sa^Sb) ? ({1'b1, Mmax, 8'b00000000} - {Mmin, 8'b00000000}) : ({1'b1, Mmax, 8'b00000000} + {Mmin, 8'b00000000}) ;
 	
 	// Assign result sign
 	assign PSgn = (MaxAB ? Sb : Sa) ;

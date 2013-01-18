@@ -12,21 +12,21 @@
 module FPMult(
 		clk,
 		rst,
-		A,
-		B,
-		Z,
-		Flags
+		a,
+		b,
+		result,
+		flags
     );
 	
 	// Input Ports
 	input clk ;							// Clock
 	input rst ;							// Reset signal
-	input [31:0] A;					// Input A, a 32-bit floating point number
-	input [31:0] B;					// Input B, a 32-bit floating point number
+	input [31:0] a;					// Input A, a 32-bit floating point number
+	input [31:0] b;					// Input B, a 32-bit floating point number
 	
 	// Output ports
-	output [31:0] Z ;					// Product, result of the operation, 32-bit FP number
-	output [4:0] Flags ;				// Flags indicating exceptions according to IEEE754
+	output [31:0] result ;					// Product, result of the operation, 32-bit FP number
+	output [4:0] flags ;				// Flags indicating exceptions according to IEEE754
 	
 	// Internal signals
 	wire [31:0] Z_int ;				// Product, result of the operation, 32-bit FP number
@@ -54,8 +54,8 @@ module FPMult(
 	reg [40:0] pipe_3;			// Pipeline register Normalize->Round
 	reg [36:0] pipe_4;			// Pipeline register Round->Output
 	
-	assign Z = pipe_4[36:5] ;
-	assign Flags = pipe_4[4:0] ;
+	assign result = pipe_4[36:5] ;
+	assign flags = pipe_4[4:0] ;
 	
 	// Prepare the operands for alignment and check for exceptions
 	FPMult_PrepModule PrepModule(pipe_0[63:32], pipe_0[31:0], Sa, Sb, Ea[7:0], Eb[7:0], Ma[23:0], Mb[23:0], InputExc[4:0]) ;
@@ -91,7 +91,7 @@ module FPMult(
 				[63:32] A
 				[31:0] B
 			*/
-			pipe_0 <= {A, B} ;
+			pipe_0 <= {a, b} ;
 			/* PIPE 1
 				[70] Sa
 				[69] Sb
