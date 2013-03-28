@@ -2,8 +2,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////
 //
-// Create Date:    13:00:02 16/11/2012 
-// Module Name:    FPAddSub_ExceptionModule 
+// Module Name:    FPDSP_ExceptionModule 
 // Project Name: 	 Floating Point Project
 // Author:			 Fredrik Brosser
 //
@@ -12,7 +11,7 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-module FPAddSub_ExceptionModule(
+module ExceptionModule(
 		Z,
 		NegE,
 		R,
@@ -32,8 +31,8 @@ module FPAddSub_ExceptionModule(
 	input EOF ;
 	
 	// Output ports
-	output [31:0] P ;					// Final result
-	output [4:0] Flags ;				// Exception flags
+	output reg [31:0] P ;					// Final result
+	output reg [4:0] Flags ;				// Exception flags
 	
 	// Internal signals
 	wire FSgn ;

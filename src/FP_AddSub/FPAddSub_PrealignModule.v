@@ -55,8 +55,10 @@ module FPAddSub_PrealignModule(
 	// Put all flags into exception vector
 	assign InputExc = {(ANaN | BNaN | AInf | BInf), ANaN, BNaN, AInf, BInf} ;
 	
-	assign DAB = (A[30:23] - B[30:23]) ;
-	assign DBA = (B[30:23] - A[30:23]) ;
+	//assign DAB = (A[30:23] - B[30:23]) ;
+	//assign DBA = (B[30:23] - A[30:23]) ;
+	assign DAB = (A[30:23] + ~(B[30:23]) + 1) ;
+	assign DBA = (B[30:23] + ~(A[30:23]) + 1) ;
 	
 	assign Sa = A[31] ;									// A's sign bit
 	assign Sb = B[31] ;									// B's sign	bit
