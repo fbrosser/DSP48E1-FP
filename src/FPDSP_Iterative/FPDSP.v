@@ -77,26 +77,14 @@ module FPDSP (
 		.PA_Opout(Opout)
    );
 	
-	// Non iterative Prealign Stage
-	ControlUnit Control (
+	// Control
+	ControlModule Control (
 	 // Inputs
 	 .clk(clk),
 	 .rst(rst),
 	 .operation(operation),
-	 .run(run),
-	 
-	 // Registered Outputs
-	 /*
-	 output reg [31:0] INSel;
-	 output reg [3:0] ALUMODE;
-	 output reg [6:0] OPMODE;
-	 output reg [4:0] INMODE;
-	 output reg MemWrite;
-	 output reg WriteBack;
-	 output reg FwdDSP;
-	 output reg ReadData;
-	 output reg A2D;
-	 */
+	 .run(run), 
+	 .A2D(A2D);
 	 .B2D(B2D);
 	 .C2D(C2D);
 	 .RAMSel(RAMSel),
@@ -108,27 +96,30 @@ module FPDSP (
 	
 	// RAM32M Instantiation
 	RAMModule RAM (
-	// Inputs
-	.Clk(Clk), .Rst(Rst),
-	.ID_PC_Select(PC_Select),
-	.ID_Alt_PC_in(Branch_PC),			// input [DSIZE-1:0] ID_Alt_PC_in
-	// Outputs
-	.IF_Inst_out(IF_ID_Inst_out),		// output [DSIZE-1:0] IF_Inst_out,
-	.IF_currPC(IF_currPC),			// output reg [`DSIZE-1:0] IF_currPC,
-	.IF_PCplus1(IF_ID_PCplus1)				// output [DSIZE-1:0] IF_PCplus1
+	.Clk(Clk), 
+	.Rst(Rst),
+	 .InSel(InSel),
+	 .RAMSel(RAMSel),
+	 .A(A),
+	 .B(B),
+	 .C(C),
+	 .W(W)
    );
 	
 	
 	// DSP48E1 Instantiation
 	DSPModule DSP (
 	// Inputs
-	.Clk(Clk), .Rst(Rst),
-	.ID_PC_Select(PC_Select),
-	.ID_Alt_PC_in(Branch_PC),			// input [DSIZE-1:0] ID_Alt_PC_in
-	// Outputs
-	.IF_Inst_out(IF_ID_Inst_out),		// output [DSIZE-1:0] IF_Inst_out,
-	.IF_currPC(IF_currPC),			// output reg [`DSIZE-1:0] IF_currPC,
-	.IF_PCplus1(IF_ID_PCplus1)				// output [DSIZE-1:0] IF_PCplus1
+	.Clk(Clk), 
+	.Rst(Rst),
+	.A(A);
+	.B(B);
+	.C(C);
+	 
+	.ALUMode(ALUMode);
+	.OpMode(OpMode);
+	.InMode(InMode);
+	.P(P);
    );
 	
 	// Non iterative Exception Checking Stage
